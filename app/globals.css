@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@config "../tailwind.config.ts";
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 0 72.2% 50.6%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 346.8 77.2% 49.8%;
+    --radius: 0.5rem;
+
+    /* Finally custom colors */
+    --finally-red-primary: 358 76% 50%;
+    --finally-red-dark: 358 64% 42%;
+    --finally-red-darker: 358 75% 35%;
+    --finally-gold-primary: 46 80% 44%;
+    --finally-gold-dark: 46 98% 30%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 72.2% 50.6%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 346.8 77.2% 49.8%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+  
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-inter), system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /* Estilos personalizados para a plataforma Finally */
+  .bg-gradient-finally {
+    @apply bg-gradient-to-br from-slate-50 to-rose-50;
+  }
+
+  .btn-finally-primary {
+    @apply bg-gradient-to-r from-[#CBA415] to-[#956F02] text-white hover:from-[#956F02] hover:to-[#CBA415];
+  }
+
+  .btn-finally-secondary {
+    @apply bg-[#D02E32] hover:bg-[#AF2427] text-white;
+  }
+
+  /* Estilos para cards e elementos de UI */
+  .card-finally {
+    @apply border-rose-200 shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  /* Animações sutis */
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105;
+  }
+
+  /* Estilos para elementos românticos */
+  .heart-icon {
+    @apply text-[#D02E32] fill-current;
+  }
+}
+
+@layer utilities {
+  /* Custom font-serif utility */
+  .font-serif {
+    font-family: var(--font-serif), 'Playfair Display', Georgia, 'Times New Roman', serif;
+  }
+  
+  /* Suppress hydration warning utility */
+  .suppress-hydration {
+    /* This class can be used to suppress hydration warnings on specific elements */
+  }
+}
