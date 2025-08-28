@@ -26,13 +26,17 @@ export function AdminRouteGuard({ children, fallbackUrl = '/' }: AdminRouteGuard
   useEffect(() => {
     const sessionUser = session?.user as SessionUser | undefined
     
+    console.log('🛡️ [ADMIN-GUARD] Full session data:', session)
     console.log('🛡️ [ADMIN-GUARD] Checking authorization:', { 
       status, 
       userEmail: sessionUser?.email,
-      userRole: sessionUser?.role 
+      userRole: sessionUser?.role,
+      userId: sessionUser?.id,
+      userName: sessionUser?.name
     })
 
     if (status === 'loading') {
+      console.log('🛡️ [ADMIN-GUARD] Still loading session...')
       return // Still loading, don't make decisions yet
     }
 
@@ -43,6 +47,7 @@ export function AdminRouteGuard({ children, fallbackUrl = '/' }: AdminRouteGuard
     }
 
     const userRole = sessionUser?.role
+    console.log('🛡️ [ADMIN-GUARD] User role check:', userRole)
     
     if (userRole === 'admin') {
       console.log('✅ [ADMIN-GUARD] Admin access granted')
