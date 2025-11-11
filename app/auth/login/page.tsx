@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
@@ -11,7 +10,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { signIn} from "next-auth/react"
+import { signIn } from "next-auth/react"
+import Image from "next/image"
+import loginImage from "@/public/assets/login-side.jpg"
+import logoImage from "@/public/assets/logo-768x319.webp"
+import iconapple from "@/public/assets/icon-apple.png"
+import iconegoogle from "@/public/assets/icone-google.png"
+import iconface from "@/public/assets/icon-face.png"
+
+
+
+
 
 export default function LoginPage() {
   const searchParams = useSearchParams()
@@ -24,37 +33,28 @@ export default function LoginPage() {
   const [emailNotVerified, setEmailNotVerified] = useState(false)
   const [showVerificationSuccess, setShowVerificationSuccess] = useState(false)
 
-  // Check for verification success message
   useEffect(() => {
-    const verified = searchParams.get('verified')
-    if (verified === 'true') {
+    const verified = searchParams.get("verified")
+    if (verified === "true") {
       setShowVerificationSuccess(true)
-      // Hide message after 5 seconds
       setTimeout(() => setShowVerificationSuccess(false), 5000)
     }
   }, [searchParams])
-  
+
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newEmail = e.target.value
-    setEmail(newEmail)
-    if (error) setError('')
+    setEmail(e.target.value)
+    if (error) setError("")
     if (emailNotVerified) setEmailNotVerified(false)
   }
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newPassword = e.target.value
-    setPassword(newPassword)
-    if (error) setError('')
+    setPassword(e.target.value)
+    if (error) setError("")
     if (emailNotVerified) setEmailNotVerified(false)
   }
 
-  const handlePasswordToggle = () => {
-    setShowPassword(!showPassword)
-  }
-
-  const handleRememberMeChange = (checked: boolean) => {
-    setRememberMe(checked)
-  }
+  const handlePasswordToggle = () => setShowPassword(!showPassword)
+  const handleRememberMeChange = (checked: boolean) => setRememberMe(checked)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,30 +63,24 @@ export default function LoginPage() {
     setEmailNotVerified(false)
 
     try {
-      const result = await signIn('credentials', {
+      const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       })
 
       if (result?.error) {
-        if (result.error === 'EMAIL_NOT_VERIFIED') {
+        if (result.error === "EMAIL_NOT_VERIFIED") {
           setEmailNotVerified(true)
           setError("Your email has not been verified yet. Check your inbox.")
         } else {
           setError("Invalid email or password")
         }
       } else {
-        // Redirect will be handled by middleware based on user role
         window.location.href = "/"
       }
-    } catch (error: unknown) {
-      if (error instanceof Error && error.message === 'EMAIL_NOT_VERIFIED') {
-        setEmailNotVerified(true)
-        setError("Your email has not been verified yet. Check your inbox.")
-      } else {
-        setError("Internal error. Please try again.")
-      }
+    } catch {
+      setError("Internal error. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -100,8 +94,7 @@ export default function LoginPage() {
 
     setIsLoading(true)
     try {
-      // Here you could implement a resend verification API
-      console.log('Resending verification to:', email)
+      console.log("Resending verification to:", email)
       setError("Verification link resent! Check your inbox.")
       setEmailNotVerified(false)
     } catch {
@@ -112,166 +105,226 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      {/* Verification Success Message */}
-      {showVerificationSuccess && (
-        <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-center space-x-2">
-            <div className="flex-shrink-0">
+    <div className="grid grid-cols-1 lg:grid-cols-2 rounded-3xl overflow-hidden ">
+      {/* --- LADO ESQUERDO (imagem + overlay ) --- */}
+      <div className="hidden lg:flex items-center justify-center relative">
+        <Image
+          src={loginImage}
+          alt="Login illustration"
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
+
+      {/* --- LADO DIREITO (formulário) --- */}
+      <div className="flex items-center justify-center bg-white relative">
+        <div className="w-full max-w-4xl space-y-8">
+          {showVerificationSuccess && (
+            <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-2">
               <Mail className="h-5 w-5 text-green-500" />
-            </div>
-            <div>
-              <h3 className="text-green-800 font-medium">Email verified successfully! 🎉</h3>
-              <p className="text-green-600 text-sm mt-1">
-                You can now log in normally.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <Card className="border-rose-200 shadow-xl">
-        <CardHeader className="text-center pb-6">
-          <div className="mx-auto mb-4 w-16 h-16 bg-[#D02E32] rounded-full flex items-center justify-center">
-            <Heart className="w-8 h-8 text-white" fill="currentColor" />
-          </div>
-          <CardTitle className="text-3xl font-serif font-bold text-gray-900">Finally</CardTitle>
-          <CardDescription className="text-gray-600 mt-2">
-            Log in to continue your journey
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Input */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-700">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={handleEmailChange}
-                  className="pl-10 h-12 border-rose-200 focus:border-[#D02E32] focus:ring-[#D02E32]"
-                  required
-                />
+              <div>
+                <h3 className="text-green-800 font-medium">Email verified successfully! 🎉</h3>
+                <p className="text-green-600 text-sm">You can now log in normally.</p>
               </div>
             </div>
+          )}
 
-            {/* Password Input */}
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Your password"
-                  value={password}
-                  onChange={handlePasswordChange}
-                  className="pl-10 pr-10 h-12 border-rose-200 focus:border-[#D02E32] focus:ring-[#D02E32]"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={handlePasswordToggle}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Remember Me */}
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="remember" 
-                checked={rememberMe}
-                onCheckedChange={handleRememberMeChange}
+          <Card className="border-none p-4">
+            <CardHeader className="text-center pb-4">
+              <Image
+                src={logoImage}
+                alt="Login illustration"
+                // className="object-cover"
+                priority
+                width={180}
+                height={60}
+                className="w-auto max-w-[70%] h-auto mx-auto md:max-w-[200px]"
               />
-              <Label htmlFor="remember" className="text-sm text-gray-600">
-                Remember me
-              </Label>
-            </div>
+            </CardHeader>
 
-            {/* Error Messages */}
-            {error && (
-              <div className={`flex items-center space-x-2 p-3 rounded-lg ${
-                emailNotVerified 
-                  ? 'bg-orange-50 border border-orange-200' 
-                  : error.includes('resent') 
-                    ? 'bg-green-50 border border-green-200'
-                    : 'bg-red-50 border border-red-200'
-              }`}>
-                <AlertCircle className={`h-4 w-4 ${
-                  emailNotVerified 
-                    ? 'text-orange-500' 
-                    : error.includes('resent')
-                      ? 'text-green-500'
-                      : 'text-red-500'
-                }`} />
-                <span className={`text-sm ${
-                  emailNotVerified 
-                    ? 'text-orange-700' 
-                    : error.includes('resent')
-                      ? 'text-green-700'
-                      : 'text-red-700'
-                }`}>
-                  {error}
-                </span>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* EMAIL */}
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-gray-700">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={handleEmailChange}
+                      className="pl-10 h-12 rounded-lg border border-gray-200 focus:border-[#D02E32] focus:ring-[#D02E32]"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* PASSWORD */}
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-gray-700">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Your password"
+                      value={password}
+                      onChange={handlePasswordChange}
+                      className="pl-10 pr-10 h-12 rounded-lg border border-gray-200 focus:border-[#D02E32] focus:ring-[#D02E32]"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={handlePasswordToggle}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-4 text-right space-y-2">
+                  <Link href="/auth/forgot-password" className="text-sm text-gray-600 hover:text-[#D02E32] transition-colors">
+                    Forgot your password?
+                  </Link>
+                </div>
+
+                {/* ERROS */}
+                {error && (
+                  <div
+                    className={`flex items-center space-x-2 p-3 rounded-lg ${emailNotVerified
+                      ? "bg-orange-50 border border-orange-200"
+                      : error.includes("resent")
+                        ? "bg-green-50 border border-green-200"
+                        : "bg-red-50 border border-red-200"
+                      }`}
+                  >
+                    <AlertCircle
+                      className={`h-4 w-4 ${emailNotVerified
+                        ? "text-orange-500"
+                        : error.includes("resent")
+                          ? "text-green-500"
+                          : "text-red-500"
+                        }`}
+                    />
+                    <span
+                      className={`text-sm ${emailNotVerified
+                        ? "text-orange-700"
+                        : error.includes("resent")
+                          ? "text-green-700"
+                          : "text-red-700"
+                        }`}
+                    >
+                      {error}
+                    </span>
+                  </div>
+                )}
+
+                {/* EMAIL NOT VERIFIED */}
+                {emailNotVerified && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 className="text-blue-800 font-medium ">📧 Email not verified</h4>
+                    <p className="text-blue-600 text-sm ">
+                      Check your inbox (including spam) for the verification email.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleResendVerification}
+                      disabled={isLoading}
+                      className="w-full border-blue-300 text-blue-700 hover:bg-blue-100"
+                    >
+                      {isLoading ? "Resending..." : "Resend Verification Email"}
+                    </Button>
+                  </div>
+                )}
+
+                {/* BOTÃO LOGIN */}
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-[#E5586B] text-white hover:bg-[#CC4B5E] transition-all duration-300 font-medium rounded-lg shadow-md"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Logging in...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center space-x-2">
+                      <span>Log in</span>
+                    </div>
+                  )}
+                </Button>
+              </form>
+              {/* Divisor com 'or' centralizado */}
+              <div className="flex items-center w-full my-6">
+                <div className="flex-grow border-t border-[#EAEAEA]"></div>
+                <span className="px-3 text-gray-500 text-sm">or</span>
+                <div className="flex-grow border-t border-[#EAEAEA]"></div>
               </div>
-            )}
 
-            {/* Email Not Verified Actions */}
-            {emailNotVerified && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="text-blue-800 font-medium mb-2">📧 Email not verified</h4>
-                <p className="text-blue-600 text-sm mb-3">
-                  Check your inbox (including spam) for the verification email.
-                </p>
+              {/* BOTÕES SOCIAIS */}
+              <div className="mt-4 space-y-3">
+
+                {/* APPLE */}
                 <Button
                   type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleResendVerification}
-                  disabled={isLoading}
-                  className="w-full border-blue-300 text-blue-700 hover:bg-blue-100"
+                  className="w-full h-12 flex items-center justify-center gap-3 bg-black text-white hover:bg-neutral-800 transition-all duration-300 font-medium"
                 >
-                  {isLoading ? 'Resending...' : 'Resend Verification Email'}
+                  <Image
+                    src={iconapple}
+                    alt="Login illustration"
+                    className="object-cover"
+                    priority
+                    width={20}
+                    height={20}
+                  />
+                  Log in with Apple
                 </Button>
+
+                {/* GOOGLE */}
+                <Button
+                  type="button"
+                  className="w-full h-12 flex items-center justify-center gap-3 bg-white text-black border border-[#EAEAEA] hover:bg-gray-100 transition-all duration-300 font-medium"
+                >
+                  <Image
+                    src={iconegoogle}
+                    alt="Login illustration"
+                    className="object-cover"
+                    priority
+                    width={20}
+                    height={20}
+                  />
+                  Log in with Google
+                </Button>
+
+                {/* FACEBOOK */}
+                <Button
+                  type="button"
+                  className="w-full h-12 flex items-center justify-center gap-3 bg-[#1877F2] text-white hover:bg-[#145DB2] transition-all duration-300 font-medium"
+                >
+                  <Image
+                    src={iconface}
+                    alt="Login illustration"
+                    className="object-cover"
+                    priority
+                    width={20}
+                    height={20}
+                  />
+                  Log in with Facebook
+                </Button>
+
               </div>
-            )}
 
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              className="w-full h-12 bg-gradient-to-r from-[#CBA415] to-[#956F02] text-white hover:from-[#956F02] hover:to-[#CBA415] transition-all duration-300 font-medium"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Logging in...</span>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center space-x-2">
-                  <span>Sign In</span>
-                  <ArrowRight className="w-4 h-4" />
-                </div>
-              )}
-            </Button>
-          </form>
-
-          {/* Footer Links */}
-          <div className="mt-6 text-center space-y-2">
-            <Link href="/auth/forgot-password" className="text-sm text-gray-600 hover:text-[#D02E32] transition-colors">
-              Forgot your password?
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }
