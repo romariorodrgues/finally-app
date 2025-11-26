@@ -107,3 +107,16 @@
     /* This class can be used to suppress hydration warnings on specific elements */
   }
 }
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+@media (max-width: 480px) {
+  img[alt="Finally logo"] {
+    max-width: 60% !important;
+  }
+}
+
+
